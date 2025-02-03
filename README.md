@@ -21,8 +21,6 @@ which operates at speeds up to 600 MHz to provide high CPU performance and best 
 in motor control. It has great Zephyr support. The board is designated `mimxrt1060_evk`.
 
 ## Build instructions
-
-
 At time of writing, this project is being built and tested with Zephyr v4.0
 
     west build -b mimxrt1060_evk --pristine
