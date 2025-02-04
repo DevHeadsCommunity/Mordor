@@ -1,3 +1,6 @@
+#include "canbus.h"
+#include "common.h"
+
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/reboot.h>

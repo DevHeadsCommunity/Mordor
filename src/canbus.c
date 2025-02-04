@@ -1,8 +1,10 @@
+#include "canbus.h"
 #include "common.h"
 
 #include <zephyr/logging/log.h>
+LOG_MODULE_DECLARE(mordor, LOG_LEVEL_INF);
 
-LOG_MODULE_DECLARE(mordor_canbus, LOG_LEVEL_INF);
+#include <zephyr/kernel.h>
 
 // using uniform values for both threads, at least for now
 #define THREAD_STACK_SIZE 512
@@ -18,6 +20,8 @@ K_THREAD_STACK_DEFINE(tx_thread_stack, THREAD_STACK_SIZE);
 struct k_thread rx_thread_data;
 struct k_thread tx_thread_data;
 
+struct k_mutex candata_mutex;
+
 const struct device *const can_device = DEVICE_DT_GET(CANBUS_NODE);
 
 void can_tx_thread(void *arg1, void *arg2, void *arg3) {
@@ -27,7 +31,6 @@ void can_tx_thread(void *arg1, void *arg2, void *arg3) {
   ARG_UNUSED(arg3);
 
   int ret;
-  uint16_t value;
   struct can_frame frame = {0};
 
   k_timer_start(&can_tx_timer, K_SECONDS(1), K_SECONDS(1));
@@ -50,10 +53,11 @@ void can_rx_thread(void *arg1, void *arg2, void *arg3) {
   ARG_UNUSED(arg2);
   ARG_UNUSED(arg3);
 
+  struct can_frame frame;
   // set can filter (mask = 0, takes all frames std and ext)
   // lets peek
   const struct can_filter filter = {
-      .flags = CAN_FILTER_DATA | CAN_FILTER_IDE, .id = 0, .mask = 0};
+      .flags = CAN_FILTER_IDE, .id = 0, .mask = 0};
 
   can_add_rx_filter_msgq(can_device, &canbus_rx_msgq, &filter);
 
@@ -87,15 +91,15 @@ int init_canbus(void) {
   LOG_INF("Starting tx thread...\n");
   tx_tid = k_thread_create(
       &tx_thread_data, tx_thread_stack, K_THREAD_STACK_SIZEOF(tx_thread_stack),
-      can_tx_thread, NULL, NULL, NULL, TX_THREAD_PRIORITY, 0, K_NO_WAIT);
+      can_tx_thread, NULL, NULL, NULL, THREAD_PRIORITY, 0, K_NO_WAIT);
   if (!tx_tid) {
     LOG_INF("ERROR spawning tx thread\n");
   }
 
   LOG_INF("Starting rx thread...\n");
-  rx_tid = k_thread_create(&rx_thread_data, rx_thread_stack,
-                           K_THREAD_STACK_SIZEOF(rx_thread_stack), rx_thread,
-                           NULL, NULL, NULL, RX_THREAD_PRIORITY, 0, K_NO_WAIT);
+  rx_tid = k_thread_create(
+      &rx_thread_data, rx_thread_stack, K_THREAD_STACK_SIZEOF(rx_thread_stack),
+      can_rx_thread, NULL, NULL, NULL, THREAD_PRIORITY, 0, K_NO_WAIT);
   if (!rx_tid) {
     LOG_INF("ERROR spawning rx thread\n");
   }
