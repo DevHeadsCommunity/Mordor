@@ -4,20 +4,20 @@
 #include "low_pass_filter.h"
 #include "pmsm_current_controller.h"
 #include "pmsm_current_ref.h"
-#include "svm.h"
+#include "svpwm.h"
 
 #define FOC_VDC_FILTER_TIME_CONST 0.01f;
 
 typedef struct {
 
-  float torque_ref;                // Torque request [Nm]
+  float torque_ref;
   three_phase_current_t iabcSense; // 3ph current [A]
   float wSense;                    // mechanical angular velocity [rad/s]
-  float thetaSense;                // mechanical angle [rad]
-  float vdcSense;                  // DC bus voltage [V]
+  float mech_rotor_angle;
+  float vdcSense; // DC bus voltage [V]
 
   // outputs
-  svm_t svm;
+  svpwm_t svm;
   direct_quadrature_voltage_t vdq;
   direct_quadrature_current_t idq_ref;
   float torque_ref_saturation;

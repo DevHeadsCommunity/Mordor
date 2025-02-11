@@ -1,4 +1,6 @@
-#include "svm.h"
+#include <zephyr/sys/util.h>
+
+#include "svpwm.h"
 
 #include <math.h>
 #include <stdint.h>
@@ -31,7 +33,17 @@ static uint8_t get_sector(float a, float b, float c) {
   return sector;
 }
 
-int space_vector_pwm_run(svm_t *svm, const float v_alpha, const float v_beta) {
+void space_vector_pwm_init(svpwm_t *svm) {
+  svm->sector = 0U;
+  svm->duties.a = 0.0f;
+  svm->duties.b = 0.0f;
+  svm->duties.c = 0.0f;
+  svm->d_min = 0.0f;
+  svm->d_max = 1.0f;
+}
+
+int space_vector_pwm_run(svpwm_t *svm, const float v_alpha,
+                         const float v_beta) {
 
   float a, b, c, mod, x, y, z;
   float alpha = v_alpha, beta = v_beta;
@@ -48,7 +60,8 @@ int space_vector_pwm_run(svm_t *svm, const float v_alpha, const float v_beta) {
   b = SQRT3 * beta;
   c = -(a + b);
 
-  switch (get_sector(a, b, c)) {
+  svm->sector = get_sector(a, b, c);
+  switch (svm->sector) {
   case 1U:
     x = a;
     y = b;
@@ -106,5 +119,9 @@ int space_vector_pwm_run(svm_t *svm, const float v_alpha, const float v_beta) {
   default:
     break;
   }
+
+  svm->duties.a = CLAMP(svm->duties.a, svm->d_min, svm->d_max);
+  svm->duties.b = CLAMP(svm->duties.b, svm->d_min, svm->d_max);
+  svm->duties.c = CLAMP(svm->duties.c, svm->d_min, svm->d_max);
   return 0;
 }

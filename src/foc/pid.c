@@ -1,3 +1,5 @@
+#include <zephyr/sys/util.h>
+
 #include "pid.h"
 #include "types.h"
 
@@ -18,12 +20,12 @@ void pi_step(pi_t *pi) {
 
   // Integral anti-windup
   pi->integrator =
-      sat(pi->integrator, pi->lower_limit_int, pi->upper_limit_int);
+      CLAMP(pi->integrator, pi->lower_limit_int, pi->upper_limit_int);
 
   // Don't perform derivative... (PI not PID)
 
   // Output and saturation
-  pi->output = sat(p + pi->integrator, pi->lower_limit, pi->upper_limit);
+  pi->output = CLAMP(p + pi->integrator, pi->lower_limit, pi->upper_limit);
 
   pi->prev_error = error;
 }

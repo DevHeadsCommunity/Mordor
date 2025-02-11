@@ -4,10 +4,13 @@
 #include "types.h"
 
 void park_transform(direct_quadrature_current_t *idq,
-                    const three_phase_current_t *iabc, const float theta_e);
+                    const three_phase_current_t *iabc,
+                    const float electrical_angle);
 
 void inverse_park_transform(three_phase_voltage_t *Vabc,
                             const direct_quadrature_voltage_t *vdq,
-                            const float theta_e);
+                            const float electrical_angle);
 
+void clarke_transform(const three_phase_voltage_t *Vabc, float *v_alpha,
+                      float *v_beta);
 #endif

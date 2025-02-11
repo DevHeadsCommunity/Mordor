@@ -7,28 +7,28 @@
 
 typedef struct {
   // Inputs
-  float torque_ref; // Reference torque [Nm]
-  float wMech;      // Mechanical speed [rad/s]
-  float wElec;      // Electrical speed [rad/s]
-  float Vdc;        // DC bus voltage [V]
+  float torque_ref;
+  float mechanical_speed;
+  float electrical_speed;
+  float Vdc; // DC bus voltage [V]
 
   // Outputs
-  direct_quadrature_current_t idq_ref; // Output idq reference current [A]
-  float torque_ref_saturation;                      // Troque reference (saturated) [Nm]
-  float torque_limit;                         // Torque limit [Nm]
+  direct_quadrature_current_t idq_ref;
+  float torque_ref_saturation;
+  float torque_limit;
 
   // Parameters
   float nominal_voltage;
-  float max_power;     // Max power [W]
-  float max_torque;    // Max torque [Nm]
-  float max_current;   // Max current [A]
-  float wBase;         // Base speed [rad/s]
-  uint16_t pole_pairs; // Pole pairs
-  float flux_link;     // Flux linkage [Webers]
-  float Ld;            // D axis inductance [H]
+  float max_power;
+  float max_torque;
+  float max_current;
+  float base_speed;
+  uint16_t pole_pairs;
+  float flux_linkage;
+  float Ld; // D axis inductance [H]
 
   // Internal variables
-  float weBase; // Electrical base speed
+  float electrical_base_speed; // Electrical base speed
 } pmsm_current_ref_t;
 
 /**

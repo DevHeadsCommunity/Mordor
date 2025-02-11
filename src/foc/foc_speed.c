@@ -7,7 +7,7 @@ void foc_speed_init(foc_speed_t *foc) {
   foc->rpmReq = 0.0f;
   foc->rpmMeas = 0.0f;
   foc->wSense = 0.0f;
-  foc->thetaSense = 0.0f;
+  foc->mech_rotor_angle = 0.0f;
   foc->vdcSense = 0.0f;
   memset(&foc->iabcSense, 0, sizeof(three_phase_current_t));
 
@@ -46,7 +46,7 @@ void foc_speed_step(foc_speed_t *foc) {
   foc->foc.torque_ref = torque_ref;
   foc->foc.iabcSense = foc->iabcSense;
   foc->foc.wSense = foc->wSense;
-  foc->foc.thetaSense = foc->thetaSense;
+  foc->foc.mech_rotor_angle = foc->mech_rotor_angle;
   foc->foc.vdcSense = foc->vdcSense;
   foc_step(&foc->foc);
 

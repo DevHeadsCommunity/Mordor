@@ -3,24 +3,34 @@
 #include <math.h>
 
 void park_transform(direct_quadrature_current_t *idq,
-                    const three_phase_current_t *iabc, const float theta_e) {
-  idq->id = sinf(theta_e) * iabc->ia + sinf(theta_e - TWO_PI_3) * iabc->ib +
-            sinf(theta_e + TWO_PI_3) * iabc->ic;
+                    const three_phase_current_t *iabc,
+                    const float electrical_angle) {
+  idq->id = sinf(electrical_angle) * iabc->ia +
+            sinf(electrical_angle - TWO_PI_3) * iabc->ib +
+            sinf(electrical_angle + TWO_PI_3) * iabc->ic;
   idq->id *= 0.666667F;
 
-  idq->iq = cosf(theta_e) * iabc->ia + cosf(theta_e - TWO_PI_3) * iabc->ib +
-            cosf(theta_e + TWO_PI_3) * iabc->ic;
+  idq->iq = cosf(electrical_angle) * iabc->ia +
+            cosf(electrical_angle - TWO_PI_3) * iabc->ib +
+            cosf(electrical_angle + TWO_PI_3) * iabc->ic;
   idq->iq *= 0.666667F;
 }
 
 void inverse_park_transform(three_phase_voltage_t *Vabc,
                             const direct_quadrature_voltage_t *vdq,
-                            const float theta_e) {
-  Vabc->va = sin(theta_e) * vdq->vd + cos(theta_e) * vdq->vq;
+                            const float electrical_angle) {
+  Vabc->va =
+      sinf(electrical_angle) * vdq->vd + cosf(electrical_angle) * vdq->vq;
 
-  Vabc->vb =
-      sin(theta_e - TWO_PI_3) * vdq->vd + cos(theta_e - TWO_PI_3) * vdq->vq;
+  Vabc->vb = sinf(electrical_angle - TWO_PI_3) * vdq->vd +
+             cosf(electrical_angle - TWO_PI_3) * vdq->vq;
 
-  Vabc->vc =
-      sin(theta_e + TWO_PI_3) * vdq->vd + cos(theta_e + TWO_PI_3) * vdq->vq;
+  Vabc->vc = sinf(electrical_angle + TWO_PI_3) * vdq->vd +
+             cosf(electrical_angle + TWO_PI_3) * vdq->vq;
+}
+
+void clarke_transform(const three_phase_voltage_t *Vabc, float *v_alpha,
+                      float *v_beta) {
+  *v_alpha = (2 / 3) * (Vabc->va - 0.5f * Vabc->vb - 0.5f * Vabc->vc);
+  *v_beta = (2 / 3) * (SQRT3_2 * Vabc->vb - SQRT3_2 * Vabc->vc);
 }

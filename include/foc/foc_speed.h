@@ -12,11 +12,11 @@ typedef struct {
   bool tqEnable;                   // Enable torque (false to coast)
   three_phase_current_t iabcSense; // 3ph current [A]
   float wSense;                    // mechnical angular velocity [rad/s]
-  float thetaSense;                // mechanical angle [rad]
+  float mech_rotor_angle;                // mechanical angle [rad]
   float vdcSense;                  // DC bus voltage [V]
 
   // outputs
-  svm_t svm;
+  svpwm_t svm;
   direct_quadrature_voltage_t vdq;
   direct_quadrature_current_t idq_ref;
   float torque_ref_saturation;

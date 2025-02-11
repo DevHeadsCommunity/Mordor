@@ -1,5 +1,5 @@
-#ifndef __SVM_H__
-#define __SVM_H__
+#ifndef __SVPWM_H__
+#define __SVPWM_H__
 
 #include "types.h"
 
@@ -20,8 +20,9 @@ typedef struct {
 
   float d_min;
   float d_max;
-} svm_t;
+} svpwm_t;
 
-int space_vector_pwm_run(svm_t *svm, const float alpha, const float beta);
+void space_vector_pwm_init(svpwm_t *svm);
+int space_vector_pwm_run(svpwm_t *svm, const float alpha, const float beta);
 
 #endif

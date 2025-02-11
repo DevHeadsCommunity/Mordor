@@ -7,11 +7,11 @@
 typedef struct {
   direct_quadrature_current_t idq_ref;
   three_phase_current_t iabcMeas;
-  float theta_e;
-  float we;
+  float electrical_angle;
+  float speed;
   float Vdc;
 
-  direct_quadrature_voltage_t vdq_out;;
+  direct_quadrature_voltage_t vdq_out;
 
   float sample_time;
 

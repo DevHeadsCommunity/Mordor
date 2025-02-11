@@ -1,3 +1,5 @@
+#include <zephyr/sys/util.h>
+
 #include "pmsm_current_controller.h"
 
 #include "transforms.h"
@@ -8,8 +10,8 @@
 void pmsm_current_controller_init(pmsm_current_controller_t *controller) {
   controller->idq_ref.id = 0.0f;
   controller->idq_ref.iq = 0.0f;
-  controller->theta_e = 0.0f;
-  controller->we = 0.0f;
+  controller->electrical_angle = 0.0f;
+  controller->speed = 0.0f;
   controller->Vdc = 0.0f;
 
   controller->vdq_out.vd = 0.0f;
@@ -25,14 +27,14 @@ void pmsm_current_controller_init(pmsm_current_controller_t *controller) {
 
 void pmsm_current_controller_step(pmsm_current_controller_t *controller) {
   direct_quadrature_current_t idqMeas;
-  park_transform(&idqMeas, &controller->iabcMeas, controller->theta_e);
+  park_transform(&idqMeas, &controller->iabcMeas, controller->electrical_angle);
 
-  float vphMax = controller->Vdc * SQRT3;
+  float max_phase_voltage = controller->Vdc * SQRT3;
 
   // D axis PI controller
   pi_t *pi_id = &controller->pi_id;
-  pi_id->upper_limit = vphMax;
-  pi_id->lower_limit = -vphMax;
+  pi_id->upper_limit = max_phase_voltage;
+  pi_id->lower_limit = -max_phase_voltage;
   pi_id->setpoint = controller->idq_ref.id;
   pi_id->measurement = idqMeas.id;
   pi_step(pi_id);
@@ -40,19 +42,17 @@ void pmsm_current_controller_step(pmsm_current_controller_t *controller) {
 
   // Q axis PI controller
   pi_t *pi_iq = &controller->pi_iq;
-  pi_iq->upper_limit = vphMax;
-  pi_iq->lower_limit = -vphMax;
+  pi_iq->upper_limit = max_phase_voltage;
+  pi_iq->lower_limit = -max_phase_voltage;
   pi_iq->setpoint = controller->idq_ref.iq;
   pi_iq->measurement = idqMeas.iq;
   pi_step(pi_iq);
   float vq = pi_iq->output;
 
-  // TODO feedforward control
-
   // voltage limiter
   // Don't need to saturate vq - the PI controller already does this
-  float vdLim = sqrtf(vphMax * vphMax - vq * vq);
-  float vdSat = sat(vd, -vdLim, vdLim);
+  float vdLim = sqrtf(max_phase_voltage * max_phase_voltage - vq * vq);
+  float vdSat = CLAMP(vd, -vdLim, vdLim);
 
   controller->vdq_out.vd = vdSat;
   controller->vdq_out.vq = vq; // saturated by PI controller

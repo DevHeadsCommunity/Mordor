@@ -14,31 +14,19 @@ typedef struct {
 } three_phase_voltage_t;
 
 typedef struct {
-  float vd;
-  float vq;
-} direct_quadrature_voltage_t;
-
-typedef struct {
   float ia;
   float ib;
   float ic;
 } three_phase_current_t;
 
 typedef struct {
+  float vd;
+  float vq;
+} direct_quadrature_voltage_t;
+
+typedef struct {
   float id;
   float iq;
 } direct_quadrature_current_t;
-
-float sat(float value, const float lower, const float upper) {
-  float newValue = value;
-
-  if (value > upper) {
-    newValue = upper;
-  } else if (value < lower) {
-    newValue = lower;
-  }
-
-  return newValue;
-}
 
 #endif
