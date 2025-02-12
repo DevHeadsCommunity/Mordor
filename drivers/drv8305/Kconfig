@@ -1,0 +1,7 @@
+config DRV8305
+       bool "DRV8305 Three-phase Gate Driver"
+       defaults n
+       depends on DT_HAS_TI_DRV8305_ENABLED
+       selects SPI
+       help
+        Enable SPI based driver for the Texas Instruments DRV8305 Driver.
