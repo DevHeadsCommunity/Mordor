@@ -1,0 +1,5 @@
+config STEPPER_FOC
+       bool "Enable stepper FOC"
+       default n
+
+source "Kconfig.zephyr"

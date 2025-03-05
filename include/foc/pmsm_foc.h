@@ -11,10 +11,10 @@
 typedef struct {
 
   float torque_ref;
-  three_phase_current_t iabcSense; // 3ph current [A]
-  float wSense;                    // mechanical angular velocity [rad/s]
+  three_phase_current_t current; // 3ph current [A]
+  float mech_velocity;           // mechanical angular velocity [rad/s]
   float mech_rotor_angle;
-  float vdcSense; // DC bus voltage [V]
+  float voltage_supply; // DC bus voltage [V]
 
   // outputs
   svpwm_t svm;
@@ -34,10 +34,10 @@ typedef struct {
 
   // internal variables
   low_pass_filter_t vdc_filter;
-} foc_t;
+} pmsm_foc_t;
 
-void foc_init(foc_t *foc);
-
-void foc_step(foc_t *foc);
+void pmsm_foc_init(pmsm_foc_t *foc);
+void pmsm_foc_step(pmsm_foc_t *foc);
+float pmsm_velocity_open_loop(pmsm_foc_t *foc, float target_speed);
 
 #endif

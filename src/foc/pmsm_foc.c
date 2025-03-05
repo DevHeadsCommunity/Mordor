@@ -4,13 +4,13 @@
 #include <math.h>
 #include <string.h>
 
-void foc_init(foc_t *foc) {
+void pmsm_foc_init(pmsm_foc_t *foc) {
   // initial values
   foc->torque_ref = 0.0f;
-  foc->wSense = 0.0f;
+  foc->mech_velocity = 0.0f;
   foc->mech_rotor_angle = 0.0f;
-  foc->vdcSense = 0.0f;
-  memset(&foc->iabcSense, 0, sizeof(three_phase_current_t));
+  foc->voltage_supply = 0.0f;
+  memset(&foc->current, 0, sizeof(three_phase_current_t));
 
   memset(&foc->svm.duties, 0, sizeof(duty_cycle_t));
   memset(&foc->vdq, 0, sizeof(direct_quadrature_voltage_t));
@@ -34,27 +34,27 @@ void foc_init(foc_t *foc) {
   low_pass_filter_init(&foc->vdc_filter);
 }
 
-void foc_step(foc_t *foc) {
+void pmsm_foc_step(pmsm_foc_t *foc) {
   // measurements
-  float electrical_speed = foc->pole_pairs * foc->wSense;
+  float electrical_speed = foc->pole_pairs * foc->mech_velocity;
   float electrical_angle =
       fmodf(foc->pole_pairs * foc->mech_rotor_angle, TWO_PI);
 
   // filter DC bus voltage
-  foc->vdc_filter.x = foc->vdcSense;
+  foc->vdc_filter.x = foc->voltage_supply;
   low_pass_filter_step(&foc->vdc_filter);
 
   foc->current_ref.torque_ref = foc->torque_ref;
-  foc->current_ref.mechanical_speed = foc->wSense;
+  foc->current_ref.mechanical_speed = foc->mech_velocity;
   foc->current_ref.electrical_speed = electrical_speed;
-  foc->current_ref.Vdc = foc->vdcSense;
+  foc->current_ref.Vdc = foc->voltage_supply;
   pmsm_current_ref_step(&foc->current_ref);
 
   foc->controller.idq_ref = foc->current_ref.idq_ref;
-  foc->controller.iabcMeas = foc->iabcSense;
+  foc->controller.iabcMeas = foc->current;
   foc->controller.electrical_angle = electrical_angle;
   foc->controller.speed = electrical_speed;
-  foc->controller.Vdc = foc->vdcSense;
+  foc->controller.Vdc = foc->voltage_supply;
   pmsm_current_controller_step(&foc->controller);
 
   three_phase_voltage_t vabc = {0};

@@ -3,17 +3,18 @@
 
 #include "pid.h"
 #include "pmsm_foc.h"
+#include "stepper_foc.h"
 
 #include <stdbool.h>
 
 typedef struct {
-  float rpmReq;                    // Requested rpm [rpm]
-  float rpmMeas;                   // Measured rpm [rpm]
-  bool tqEnable;                   // Enable torque (false to coast)
+  float rpm_requested;
+  float rpm_measured;
+  bool torque_enable;              //  (false to coast)
   three_phase_current_t iabcSense; // 3ph current [A]
-  float wSense;                    // mechnical angular velocity [rad/s]
-  float mech_rotor_angle;                // mechanical angle [rad]
-  float vdcSense;                  // DC bus voltage [V]
+  float mech_rotor_velocity;
+  float mech_rotor_angle;
+  float vdcSense; // DC bus voltage [V]
 
   // outputs
   svpwm_t svm;
@@ -28,7 +29,11 @@ typedef struct {
   float sample_time; // sample time
   float max_torque;  // Max torque [Nm]
 
-  foc_t foc;
+#if CONFIG_STEPPER_FOC
+  stepper_foc_t foc;
+#else
+  pmsm_foc_t foc;
+#endif
   pi_t pi_speed;
 } foc_speed_t;
 
