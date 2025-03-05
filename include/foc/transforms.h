@@ -13,4 +13,6 @@ void inverse_park_transform(three_phase_voltage_t *Vabc,
 
 void clarke_transform(const three_phase_voltage_t *Vabc, float *v_alpha,
                       float *v_beta);
+
+float normalize_angle(float angle);
 #endif

@@ -1,12 +1,13 @@
 #include "foc_speed.h"
+#include "foc.h"
 
 #include <string.h>
 
 void foc_speed_init(foc_speed_t *foc) {
   // initial values
-  foc->rpmReq = 0.0f;
-  foc->rpmMeas = 0.0f;
-  foc->wSense = 0.0f;
+  foc->rpm_requested = 0.0f;
+  foc->rpm_measured = 0.0f;
+  foc->mech_rotor_velocity = 0.0f;
   foc->mech_rotor_angle = 0.0f;
   foc->vdcSense = 0.0f;
   memset(&foc->iabcSense, 0, sizeof(three_phase_current_t));
@@ -34,20 +35,20 @@ void foc_speed_init(foc_speed_t *foc) {
 
 void foc_speed_step(foc_speed_t *foc) {
   pi_t *pi_speed = &foc->pi_speed;
-  pi_speed->setpoint = foc->rpmReq;
-  pi_speed->measurement = foc->rpmMeas;
+  pi_speed->setpoint = foc->rpm_requested;
+  pi_speed->measurement = foc->rpm_measured;
   pi_step(pi_speed);
 
   float torque_ref = 0.0f;
-  if (true == foc->tqEnable) {
+  if (true == foc->torque_enable) {
     torque_ref = pi_speed->output;
   }
 
   foc->foc.torque_ref = torque_ref;
-  foc->foc.iabcSense = foc->iabcSense;
-  foc->foc.wSense = foc->wSense;
+  foc->foc.current = foc->iabcSense;
+  foc->foc.mech_velocity = foc->mech_rotor_velocity;
   foc->foc.mech_rotor_angle = foc->mech_rotor_angle;
-  foc->foc.vdcSense = foc->vdcSense;
+  foc->foc.voltage_supply = foc->vdcSense;
   foc_step(&foc->foc);
 
   foc->svm = foc->foc.svm;
