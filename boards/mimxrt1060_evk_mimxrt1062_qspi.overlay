@@ -1,0 +1,61 @@
+/ {
+        l298n_motor: l298n-motor{
+                pwms = <&flexpwm4_pwm0 0 PWM_MSEC(20) PWM_POLARITY_INVERTED>;
+                // Pins order: IN3,IN4
+                gpios = <&gpio1 26 GPIO_ACTIVE_HIGH>, <&gpio1 27 GPIO_ACTIVE_HIGH>;
+        };
+};
+
+&pinctrl{
+	pinmux_flexpwm_fmu_ch1: pinmux_flexpwm_fmu_ch1 {
+		group0 {
+			pinmux = <&iomuxc_gpio_ad_b1_08_flexpwm4_pwma0>;
+
+			drive-strength = "r0-7";
+			slew-rate = "fast";
+			nxp,speed = "200-mhz";
+		};
+	};
+
+	pinmux_flexpwm_fmu_ch2: pinmux_flexpwm_fmu_ch2 {
+		group0 {
+			pinmux = <&iomuxc_gpio_ad_b0_10_flexpwm1_pwma3>;
+
+			drive-strength = "r0-7";
+			slew-rate = "fast";
+			nxp,speed = "200-mhz";
+		};
+	};
+
+	pinmux_flexpwm_fmu_ch3: pinmux_flexpwm_fmu_ch3 {
+		group0 {
+			pinmux = <&iomuxc_gpio_sd_b0_02_flexpwm1_pwma1>;
+
+			drive-strength = "r0-7";
+			slew-rate = "fast";
+			nxp,speed = "200-mhz";
+		};
+	};
+
+};
+
+&flexpwm4_pwm0 {
+  status = "okay";
+  pinctrl-0 = <&pinmux_flexpwm_fmu_ch1>;
+  pinctrl-names = "default";
+  nxp,prescaler = <64>;
+};
+
+&flexpwm1_pwm3 {
+  status = "okay";
+  pinctrl-0 = <&pinmux_flexpwm_fmu_ch2>;
+  pinctrl-names = "default";
+  nxp,prescaler = <64>;
+};
+
+&flexpwm1_pwm1 {
+  status = "okay";
+  pinctrl-0 = <&pinmux_flexpwm_fmu_ch3>;
+  pinctrl-names = "default";
+  nxp,prescaler = <64>;
+};
