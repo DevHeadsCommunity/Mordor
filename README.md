@@ -1,3 +1,13 @@
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Fundamental Concept of PMSM FOC](#fundamental-concept-of-pmsm-foc)
+- [Software Stack](#software-stack)
+- [Configuration](#configuration)
+- [Build Instructions](#build-instructions)
+- [Contributing](#contributing)
+  - [New Feature](#new-feature)
+
 # motor control firmware
 
 A Zephyr firmware implementation for controlling a 3-phase sensorless PMSM motor with a field oriented
